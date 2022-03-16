@@ -5,7 +5,7 @@ require './lib/turn'
 require './lib/game'
 require 'pry'
 #-------------------------------------------------------------------
-# create the deck of cards
+# create the aray of cards
 suits = [:heart, :spade, :club, :diamond]
 values = ["2","3","4","5","6","7","8","9","10","Jack","Queen","King","Ace"]
 cards = []
@@ -21,6 +21,8 @@ cards2.concat(cards-cards1)
 #create the array of cards
 #-------------------------------------------------------------------
 
+
+
 deck1 = Deck.new(cards1)
 deck2 = Deck.new(cards2)
 
@@ -33,11 +35,17 @@ puts "Welcome to War! (or Peace). This game will be played with #{cards.length} 
     "The players today are #{player1.name} and #{player2.name}. \n" +
     "Type 'GO' to start the game. \n" +
     "--------------------------------------------------------------------------------------"
+ready = gets.chomp
+until  ready.downcase == "go"
+    puts "Invalid input. Try again. Type 'GO' to start"
+    ready = gets.chomp
+
+end
 
 my_game = Game.new(player1,player2)
 
 
-
+my_game.start_game
 
 
 
