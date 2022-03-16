@@ -1,9 +1,10 @@
 class Turn
-    attr_reader :player1, :player2, :spoils_of_war
+    attr_reader :player1, :player2, :spoils_of_war, :turn_type
     def initialize(player1,player2)
         @player1 = player1
         @player2 = player2
         @spoils_of_war = []
+        @turn_type = nil
         
     end
 
@@ -43,15 +44,15 @@ class Turn
 # if the turn has a type of :war the winner will be whichever player has a higher rank_of_card_at(2)
 # if the turn has a type of :mutually_assured_destruction the method will return No Winner.
     def winner
-       turn_type = self.type
+       @turn_type = self.type
        #based on the turn type we determine the winner. 
     
-        if turn_type == :basic 
+        if @turn_type == :basic 
             #if the turn is basic, we determine the winner by the rank of the card at index 0
             return @player1 if @player1.deck.rank_of_card_at(0) > @player2.deck.rank_of_card_at(0)
             return @player2 if @player1.deck.rank_of_card_at(0) < @player2.deck.rank_of_card_at(0)
         # this would still have a problem if they both had exactly two cards left and had a war on the 2nd to last card
-        elsif turn_type == :war 
+        elsif @turn_type == :war 
             #this is also here to deal with small decks, but should be refined
             if @player1.deck.cards.length < 3 || @player2.deck.cards.length < 3
                 return @player1 if @player1.deck.cards.length > @player2.deck.cards.length
@@ -62,7 +63,7 @@ class Turn
                 return @player2 if @player1.deck.rank_of_card_at(2) < @player2.deck.rank_of_card_at(2)
             end
             
-        elsif turn_type == :mutually_assured_destruction
+        elsif @turn_type == :mutually_assured_destruction
             #if the turn type is mutually_assured_destruction, there is no winner
             "No Winner"        
         end
@@ -76,17 +77,15 @@ class Turn
 # this method deltes the cards from the players decks, so type and winner cannot be called after this method
 
     def pile_cards
-        turn_type = self.type
+        # turn_type = self.type
         #if the turn type is basic, both players move the first card of their decks to the spoils
-        if turn_type == :basic
+        if @turn_type == :basic
             @spoils_of_war << @player1.deck.cards[0]
-            #binding.pry
             @spoils_of_war << @player2.deck.cards[0]
-            #binding.pry 
             @player1.deck.remove_card
             @player2.deck.remove_card
         #if the turn type is war, both players move the first 3 cards to the spoils
-        elsif turn_type == :war
+        elsif @turn_type == :war
             @spoils_of_war.concat(@player1.deck.cards[0..2])
             #binding.pry
             @spoils_of_war.concat(@player2.deck.cards[0..2])
