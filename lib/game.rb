@@ -12,7 +12,7 @@ class Game
         turn_counter = 1
         #turns will continue to be created and run until one of the players has lost or we reach the
         # a maximum number of turns
-        until @player1.has_lost? == true || @player2.has_lost? == true || turn_counter >10000
+        until @player1.has_lost? == true || @player2.has_lost? == true || turn_counter >100000
             self.start_turn(turn_counter)
             turn_counter +=1
         end
@@ -48,7 +48,7 @@ class Game
         @turn.pile_cards
         # add the won cards to the winner of the turn
         @turn.award_spoils(winner)
-        
+
         #prints the winner of the turn and how many cards they won.
         if type_of_turn == :basic
             puts "Turn #{turn_counter}: #{winner.name} won two cards"
