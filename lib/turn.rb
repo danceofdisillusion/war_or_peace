@@ -4,7 +4,7 @@ class Turn
         @player1 = player1
         @player2 = player2
         @spoils_of_war = []
-        @turn_type = nil
+        @turn_type = nil #this will be nil until the winner method is called
         
     end
 
@@ -13,30 +13,21 @@ class Turn
     # A :war turn occurs when both players’ rank_of_card_at(0) are the same.
     # :mutually_assured_destruction occurs when both players’ rank_of_card_at(0) AND rank_of_card_at(2) are the same.
     def type
+        # if the first cards in the players deck have different ranks return basic
         if @player1.deck.rank_of_card_at(0) != @player2.deck.rank_of_card_at(0)
             return :basic
+        # if the rank of the first card is the same, we check the rank of the third card.
+        # if the ranks of the third cards are the same, the turn is mutually_assured_destruction
         elsif @player1.deck.rank_of_card_at(0) == @player2.deck.rank_of_card_at(0)
-            #this was included to deal with decks that have too few cards
-            # this should be refined
-            if @player1.deck.cards.length < 3 || @player2.deck.cards.length < 3
-                #does not account for if both decks have exactly 1 or exactly 2 cards
-                return :war
-
-            elsif @player1.deck.rank_of_card_at(2) == @player2.deck.rank_of_card_at(2)
+            if @player1.deck.rank_of_card_at(2) == @player2.deck.rank_of_card_at(2)
                 return :mutually_assured_destruction
+            # We will get here if the ranks of the first cards are the same but the ranks of the second cards are
+            # third cards are different. This is WAR
             else
                 return :war
             end
                 
         end
-        
-        #this was my previous version. It gave errors if either deck had less than 3 cards
-        # elsif 
-        #     @player1.deck.rank_of_card_at(0) == @player2.deck.rank_of_card_at(0) && @player1.deck.rank_of_card_at(2) == @player2.deck.rank_of_card_at(2)
-        #     return :mutually_assured_destruction
-        # elsif @player1.deck.rank_of_card_at(0) == @player2.deck.rank_of_card_at(0)
-        #     return :war
-        # end
     end
 
 # winner: this method will determine the winner of the turn.
@@ -51,22 +42,15 @@ class Turn
             #if the turn is basic, we determine the winner by the rank of the card at index 0
             return @player1 if @player1.deck.rank_of_card_at(0) > @player2.deck.rank_of_card_at(0)
             return @player2 if @player1.deck.rank_of_card_at(0) < @player2.deck.rank_of_card_at(0)
-        # this would still have a problem if they both had exactly two cards left and had a war on the 2nd to last card
         elsif @turn_type == :war 
-            #this is also here to deal with small decks, but should be refined
-            if @player1.deck.cards.length < 3 || @player2.deck.cards.length < 3
-                return @player1 if @player1.deck.cards.length > @player2.deck.cards.length
-                return @player2 if @player1.deck.cards.length < @player2.deck.cards.length
-            else
-                #if the turn is war we determine the winner by the rank of the card at index 2
-                return @player1 if @player1.deck.rank_of_card_at(2) > @player2.deck.rank_of_card_at(2)
-                return @player2 if @player1.deck.rank_of_card_at(2) < @player2.deck.rank_of_card_at(2)
-            end
-            
+            # if the turn type is war, we use the rank of the third cards to determin the winner
+            return @player1 if @player1.deck.rank_of_card_at(2) > @player2.deck.rank_of_card_at(2)
+            return @player2 if @player1.deck.rank_of_card_at(2) < @player2.deck.rank_of_card_at(2)
         elsif @turn_type == :mutually_assured_destruction
-            #if the turn type is mutually_assured_destruction, there is no winner
-            "No Winner"        
+        #if the turn type is mutually_assured_destruction, there is no winner
+            "No Winner"    
         end
+        
     end
 
 
@@ -77,26 +61,29 @@ class Turn
 # this method deltes the cards from the players decks, so type and winner cannot be called after this method
 
     def pile_cards
-        # turn_type = self.type
+    
         #if the turn type is basic, both players move the first card of their decks to the spoils
         if @turn_type == :basic
+            #add cars to spoils
             @spoils_of_war << @player1.deck.cards[0]
             @spoils_of_war << @player2.deck.cards[0]
+            #remove cards from their original decks
             @player1.deck.remove_card
             @player2.deck.remove_card
         #if the turn type is war, both players move the first 3 cards to the spoils
         elsif @turn_type == :war
+            #add cards to spoils
             @spoils_of_war.concat(@player1.deck.cards[0..2])
-            #binding.pry
             @spoils_of_war.concat(@player2.deck.cards[0..2])
-            
+            # remove the first 3 cards from the original decks
             3.times do @player1.deck.remove_card
             end
             3.times do @player2.deck.remove_card
             end
         #otherwise the type is mutually assured distruction and the first three cards of 
-        # both decks are removed from the game
+        # both decks are removed from the game         
         else
+            #remove the first 3 cards from both decks. These are not added back to any deck
             3.times do @player1.deck.remove_card
             end
             3.times do @player2.deck.remove_card
@@ -112,11 +99,8 @@ class Turn
 
      def award_spoils(winner)
         
-        if winner == @player1
+        if winner == @player1 || winner == @player2
             
-            winner.deck.cards.concat(spoils_of_war)
-        elsif winner == @player2
-
             winner.deck.cards.concat(spoils_of_war)
         else
             

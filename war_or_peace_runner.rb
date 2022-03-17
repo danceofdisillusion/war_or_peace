@@ -22,28 +22,34 @@ cards2.concat(cards-cards1)
 #-------------------------------------------------------------------
 
 
-
+# create the player decks
 deck1 = Deck.new(cards1)
 deck2 = Deck.new(cards2)
 
+
+#get player names and initialize the players
 p "Please input player 1 name"
 player1 = Player.new(gets.chomp,deck1)
 p "Please input player 2 name"
 player2 = Player.new(gets.chomp,deck2)
 
+
+
 puts "Welcome to War! (or Peace). This game will be played with #{cards.length} cards. \n" +
     "The players today are #{player1.name} and #{player2.name}. \n" +
     "Type 'GO' to start the game. \n" +
     "--------------------------------------------------------------------------------------"
-ready = gets.chomp
+
+# require the player to type go to start the game.
+    ready = gets.chomp
 until  ready.downcase == "go"
     puts "Invalid input. Try again. Type 'GO' to start"
     ready = gets.chomp
 
 end
 
+# play the game!
 my_game = Game.new(player1,player2)
-
 
 my_game.start_game
 
